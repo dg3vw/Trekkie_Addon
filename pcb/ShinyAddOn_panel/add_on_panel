@@ -1,0 +1,20 @@
+{
+    "layout": {
+        "hspace": "2mm",
+        "vspace": "2",
+        "rows": "2",
+        "cols": "4"
+    },
+    "cuts": {
+        "type": "mousebites"
+    },
+    "framing": {
+        "type": "frame"
+    },
+    "tooling": {
+        "type": "4hole"
+    },
+    "fiducials": {
+        "type": "4fid"
+    }
+}
