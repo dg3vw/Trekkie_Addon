@@ -2,7 +2,7 @@
 
 //project's contants
 #define BUZZER_PIN PC0
-#define BLUE_LED_PIN PD0
+#define BLUE_LED_PIN PC3
 const char * tetris = "tetris:d=4,o=5,b=160:e6,8b,8c6,8d6,16e6,16d6,8c6,8b,a,8a,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,2a,8p,d6,8f6,a6,8g6,8f6,e6,8e6,8c6,e6,8d6,8c6,b,8b,8c6,d6,e6,c6,a,a";
 const char * arkanoid = "Arkanoid:d=4,o=5,b=140:8g6,16p,16g.6,2a#6,32p,8a6,8g6,8f6,8a6,2g6";
 const char * startrek = "Star Trek:o=5,d=16,b=63,b=63:8f.,a#,4d#6.,8d6,a#.,g.,c6.,4f6";

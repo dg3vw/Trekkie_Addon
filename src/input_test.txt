@@ -1,0 +1,41 @@
+#include <Arduino.h>
+#define LED_DISH_BOTTOM_LEFT PD4
+#define LED_DISH_BOTTOM_RIGHT PD5
+
+// Function to configure PD7 as an input pin
+void configurePD7AsInput() {
+  // Enable the clock for GPIO port D
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+
+  // Configure PD7 as an input with pull-up resistor
+  GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; // Use GPIO_Mode_IPU for internal pull-up
+  GPIO_Init(GPIOD, &GPIO_InitStructure);
+}
+
+void setup() {
+  // Configure PD7 as input
+  configurePD7AsInput();
+  pinMode(LED_DISH_BOTTOM_LEFT, OUTPUT);
+  pinMode(LED_DISH_BOTTOM_RIGHT, OUTPUT);
+
+  digitalWrite(LED_DISH_BOTTOM_RIGHT, LOW); 
+  
+
+}
+
+void loop() {
+  // Read the state of PD7
+  int pd7State = digitalRead(PD7);
+
+  // Print the state to the serial monitor
+  if (pd7State == HIGH) {
+    digitalWrite(LED_DISH_BOTTOM_LEFT, HIGH);
+  } else {
+    digitalWrite(LED_DISH_BOTTOM_LEFT, LOW);
+  }
+
+  // Delay for 1 second
+  delay(1000);
+}
