@@ -14,7 +14,7 @@
 #define LED_DISH_BOTTOM_RIGHT PD5
 #define LED_DEFLECTOR PD0
 #define SWITCH_1 PD6
-#define SWITCH_2 PD7
+#define SWITCH_2 PD7 // <- work only if Pin D7 is reprogrammed to be an input (not NRST)
 
 // Structure to hold LED timing parameters
 struct LedTiming {
@@ -30,12 +30,12 @@ struct LedTiming {
 // Define interval arrays for each LED (example)
 // Top Dish LEDs
 const long topDishLeftData[][3] = {
-    {10000, 10, 1},   // 100ms ON, 900ms OFF, repeat 3 times
+    {2000, 15, 1},   // 100ms ON, 900ms OFF, repeat 3 times
     
 };
 
 const long topDishRightData[][3] = {
-    {10000, 10, 1},   // 100ms ON, 900ms OFF, repeat 3 times
+    {2100, 15, 1},   // 100ms ON, 900ms OFF, repeat 3 times
 };
 
 // Bottom Dish LEDs
@@ -53,7 +53,7 @@ const long bottomDishRightData[][3] = {
 
 // Front LED
 const long frontLedData[][3] = {
-    {3500, 500, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
+    {2500, 500, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
 };
 
 // Blue Motor LEDs
@@ -71,11 +71,11 @@ const long blueMotorRightData[][3] = {
 
 // Red Motor LEDs
 const long redMotorLeftData[][3] = {
-    {6390, 10, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
+    {5000, 500, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
 };
 
 const long redMotorRightData[][3] = {
-    {6390, 10, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
+    {5000, 500, 1},   // 5000ms ON, 60ms OFF, repeat 1 time
 };
 
 // Deflector LED
@@ -115,6 +115,8 @@ int leds[] = {
     LED_DEFLECTOR};
 
 const char *startrek = "StarTrekTNG:d=32,o=6,b=63:8f#.5,b.5,d#.,8c#.,a.5,g#.,4f#.,a.5,e.,f#.,g#.,e.,8d#,8c#,8b.5,d#.,b.5,2c#";
+const char *rickroll = "RickRoll:d=4,o=5,b=200:8g,8a,8c6,8a,e6,8p,e6,8p,d6.,p,8p,8g,8a,8c6,8a,d6,8p,d6,8p,c6,8b,a.,8g,8a,8c6,8a,2c6,d6,b,a,g.,8p,g,2d6,2c6.,p,8g,8a,8c6,8a,e6,8p,e6,8p,d6.,p,8p,8g,8a,8c6,8a,2g6,b,c6.,8b,a,8g,8a,8c6,8a,2c6,d6,b,a,g.,8p,g,2d6,2c6.";
+
 
 // Zapping sound parameters (for SWITCH_1)
 const int zapFrequencies[] = {400, 600, 800, 1000, 800, 600, 400, 300, 200}; // Frequencies for the zap sound
@@ -131,6 +133,30 @@ const int numBeepTones = sizeof(beepFrequencies) / sizeof(beepFrequencies[0]);
 unsigned long beepStartTime = 0; // Stores the start time of the beep sound
 int beepToneIndex = 0;          // Index of the current tone
 bool isBeeping = false;        // Flag to indicate if the beep sound is playing
+
+// New variables for rickroll functionality
+int switch1PressCount = 0; // Counter for switch 1 presses
+bool isRickrolling = false;  // Flag to indicate if Rickroll is playing
+unsigned long rickrollBlinkMillis = 0;
+int rickrollBlinkState = LOW;
+
+
+// Function to play Rickroll
+void playRickroll() {
+    if (!isRickrolling) {
+        isRickrolling = true;
+        rtttl::begin(BUZZER, rickroll);
+    }
+    if (rtttl::done()) {
+        isRickrolling = false;
+        //reset leds
+        for (int i = 0; i < sizeof(leds) / sizeof(leds[0]); i++) {
+            digitalWrite(leds[i], HIGH); 
+        }
+    } else {
+        rtttl::play();
+    }
+}
 
 void setup() {
     pinMode(LED_FRONT, OUTPUT);
@@ -151,10 +177,10 @@ void setup() {
         digitalWrite(leds[i], HIGH); // Start all LEDs as off
     }
 
-    /*rtttl::begin(BUZZER, startrek);
+    rtttl::begin(BUZZER, startrek);
     while (!rtttl::done()) {
         rtttl::play();
-    }*/
+    }
 }
 
 void handleLedBlinking(LedTiming &led) {
@@ -220,38 +246,68 @@ void playBeepSound() {
     }
 }
 
+void rickrollBlink() {
+    unsigned long currentMillis = millis();
+    if (currentMillis - rickrollBlinkMillis >= 50) {
+        rickrollBlinkMillis = currentMillis;
+        rickrollBlinkState = !rickrollBlinkState; // Toggle state
+        if (rickrollBlinkState == HIGH) {
+            int randomIndex = random(sizeof(leds) / sizeof(leds[0]));
+            digitalWrite(leds[randomIndex], LOW);
+        } else {
+            for (int i = 0; i < sizeof(leds) / sizeof(leds[0]); i++) {
+                digitalWrite(leds[i], HIGH);
+            }
+        }
+    }
+}
+
 void loop() {
     unsigned long currentMillis = millis(); // Moved inside the loop!
 
-    // Handle top dish LEDs blinking
-    handleLedGroupBlinking(topDishLeds, sizeof(topDishLeds) / sizeof(topDishLeds[0]));
+    if (!isRickrolling) {
+        // Handle top dish LEDs blinking
+        handleLedGroupBlinking(topDishLeds, sizeof(topDishLeds) / sizeof(topDishLeds[0]));
 
-    // Handle bottom dish LEDs blinking
-    handleLedGroupBlinking(bottomDishLeds, sizeof(bottomDishLeds) / sizeof(bottomDishLeds[0]));
+        // Handle bottom dish LEDs blinking
+        handleLedGroupBlinking(bottomDishLeds, sizeof(bottomDishLeds) / sizeof(bottomDishLeds[0]));
 
-    // Handle Front LED blinking
-    handleLedBlinking(frontLed);
+        // Handle Front LED blinking
+        handleLedBlinking(frontLed);
 
-    // Handle blue motor LEDs blinking
-    handleLedGroupBlinking(blueMotorLeds, sizeof(blueMotorLeds) / sizeof(blueMotorLeds[0]));
+        // Handle blue motor LEDs blinking
+        handleLedGroupBlinking(blueMotorLeds, sizeof(blueMotorLeds) / sizeof(blueMotorLeds[0]));
 
-    // Handle red motor LEDs blinking
-    handleLedGroupBlinking(redMotorLeds, sizeof(redMotorLeds) / sizeof(redMotorLeds[0]));
+        // Handle red motor LEDs blinking
+        handleLedGroupBlinking(redMotorLeds, sizeof(redMotorLeds) / sizeof(redMotorLeds[0]));
+    }
 
     // Handle deflector LED blinking when switch 1 is pressed and play sound
     if (digitalRead(SWITCH_1) == LOW) { // Switch is active LOW
-        switch1Pressed = true;
-        if (!isZapping) {
-            isZapping = true;
-            zapToneIndex = 0;
-            zapStartTime = currentMillis;
-            tone(BUZZER, zapFrequencies[zapToneIndex]);
+        if (!switch1Pressed) {
+            switch1PressCount++;
+            switch1Pressed = true;
+            if (!isZapping) {
+                isZapping = true;
+                zapToneIndex = 0;
+                zapStartTime = currentMillis;
+                tone(BUZZER, zapFrequencies[zapToneIndex]);
+            }
         }
     } else {
         switch1Pressed = false;
+        if (switch1PressCount >= 10 && !isRickrolling) {
+            switch1PressCount = 0;
+            playRickroll();
+        }
     }
 
-    // Handle new beep sound when switch 2 is pressed
+    if(isRickrolling){
+        rickrollBlink();
+        playRickroll();
+    }
+
+    // Handle new beep sound when switch 2 is pressed <- work only if Pin D7 is reprogrammed to be an input (not NRST)
     if (digitalRead(SWITCH_2) == LOW) { // Switch is active LOW
         switch2Pressed = true;
         if (!isBeeping) {
@@ -264,12 +320,15 @@ void loop() {
         switch2Pressed = false;
     }
 
-    if (switch1Pressed) {
-        handleLedBlinking(deflectorLed);
-    } else {
-        digitalWrite(LED_DEFLECTOR, HIGH); // Keep deflector off when switch is not pressed
-    }
-
-    playZapSound(); // Play the zapping sound if it's active
-    playBeepSound(); // Play the beep sound if it's active
-}
+    if (switch1Pressed && !isRickrolling) {
+                handleLedBlinking(deflectorLed);
+             } else if(!isRickrolling) {
+                 digitalWrite(LED_DEFLECTOR, HIGH); // Keep deflector off when switch is not pressed
+             }
+             
+             if (!isRickrolling) {
+                 playZapSound(); // Play the zapping sound if it's active
+             } 
+             playBeepSound(); // Play the beep sound if it's active
+        
+        }
