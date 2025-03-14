@@ -6,11 +6,11 @@ my contribution to Hackaday Europe 2025 Badge SAO
 ![PXL_20250314_204249380 MP~2](https://github.com/user-attachments/assets/0bc40702-85f7-4b31-984d-9b69915c3f4d)
 
 ### general 
-compatible to 2024 Supercon 8 prototyp I2C prototyping pedal add on, using CH32v003 (https://github.com/Hack-a-Day/2024-Supercon-8-Add-On-Badge/blob/main/hardware/sao/i2c_proto_petal/sao_proto.pdf) 
+* compatible to 2024 Supercon 8 prototyp I2C prototyping pedal add on, using CH32v003 (https://github.com/Hack-a-Day/2024-Supercon-8-Add-On-Badge/blob/main/hardware/sao/i2c_proto_petal/sao_proto.pdf) 
+* I added a few leds, two switches and a buzzer. Every LED is connected to a single gpio pin.
+* you can change the light and sound as you wish, also with the pipico on the badge
 
-I added a few leds, two switches and a buzzer. Every LED is connected to a single gpio pin.
-
-
+if u use my firmware, dont fire to much ;-)
 
 ### PINOUT: 
 * PC0 - buzzer
@@ -25,7 +25,7 @@ I added a few leds, two switches and a buzzer. Every LED is connected to a singl
 * PD3 - dish top right
 * PD4 - dish bottom left
 * PD5 - dish bottom right
-* PD6 - SWITCH 2
+* PD6 - SWITCH 2 - fire the plasma cannon
 * PD7 - SWITCH 1 (reset (NRST), can be changed to regular gpio using minichlink -D (from ch32fun)
 
 ## some impressions from the making:
