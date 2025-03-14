@@ -33,3 +33,5 @@ I added a few leds, two switches and a buzzer. Every LED is connected to a singl
 ![PXL_20250307_085021719](https://github.com/user-attachments/assets/a16376bf-064f-4304-97c0-cd55332c92a0)
 ![PXL_20250307_090016560](https://github.com/user-attachments/assets/8b0082a5-40ff-490a-8758-59bd5f4e3ac2)
 ![PXL_20250310_182050628](https://github.com/user-attachments/assets/07f6ccd0-0f0a-4226-9d20-6d4a7bfd3e9d)
+![PXL_20250314_213640538](https://github.com/user-attachments/assets/db35dafc-988d-4545-a24f-d7f22d9a3a61)
+
